@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 function App() {
@@ -10,63 +10,97 @@ function App() {
     'https://picsum.photos/id/240/1000/500',
     'https://picsum.photos/id/241/1000/500',
     'https://picsum.photos/id/242/1000/500',
+    'https://picsum.photos/id/243/1000/500',
+    'https://picsum.photos/id/244/1000/500',
+    'https://picsum.photos/id/232/1000/500',
   ])
-  const slideImg = (num) => {
 
-    //Description//
-    //ใช้การ slide โดยการนำภาพมาเรียงกันใน flex container แล้วใช้การ transform ภาพไปข้างๆแทน//
-    //อ้างอิงการใช้ transform จากภาพแรกสุด//
+  //Description//
+  //ใช้การ slide โดยการนำภาพมาเรียงกันใน flex container แล้วใช้การ transform translate ภาพไปข้างๆแทน//
+  //อ้างอิงการใช้ translate จากภาพแรกสุด//
 
+
+  //function เอาไว้ส่งข้อมูลของ Dom ไปให้ function slide ต่างๆเอาไปใช้
+  const getDataElement = () => {
     //เอา element ของ img มา
     let slider = document.querySelector(".slider");
-    let imgs = document.querySelectorAll(".slider img");
 
+    //get image elements
+    let imgs = document.querySelectorAll(".slider img");
     //get image width
     let width = imgs[0].clientWidth;
 
-    //ถ้า Next จนภาพสุดท้ายแล้วก็ set transform ให้มันย้อนกลับมาภาพที่ 1
-    if(num > imgList.length-1){
-      slider.style.transform = `translate(${0}px)`
+    const data = {slider : slider, imgWidth : width};
+    return data;
+  }
+
+  //function สำหรับกดจุดภาพแล้วจะพาไปยังภาพนั้นๆ
+  const skipImg = (num) => {
+    const element = getDataElement();
+
+    element.slider.style.transform = `translate(${-num * element.imgWidth}px)` 
+    setCount(num)
+  }
+
+
+  //function สำหรับไปภาพต่อไป
+  const nextImg = () => {
+    const element = getDataElement();
+
+    if(count+1 > imgList.length-1){
+      element.slider.style.transform = `translate(${0}px)`
       setCount(0)
     }
+    else{
+      element.slider.style.transform = `translate(${-(count+1) * element.imgWidth}px)` 
+      // console.log(num)
+      setCount(count => count + 1)
+    }
+  }
+
+  //function สำหรับกลับไปภาพก่อนหน้า
+  const prevImg = () => {
+    const element = getDataElement();
+
     //ถ้า prev จนกลับมาภาพแรกก็จะให้ set transform กลับไปภาพสุดท้าย
-    else if(num < 0){
-      slider.style.transform = `translate(${-(imgs.length -1) * width}px)`
+    if(count-1 < 0){
+      element.slider.style.transform = `translate(${-(imgList.length -1) * element.imgWidth}px)`
       setCount(imgList.length-1)
     }
     else{
-      slider.style.transform = `translate(${-num * width}px)` 
-      console.log(num)
-      setCount(num)
+      element.slider.style.transform = `translate(${-(count - 1) * element.imgWidth}px)` 
+      // console.log(num)
+      setCount(count => count - 1)
     }
-
-    console.log(width)
   }
 
   return (
     <div className="App">
-      <div className='container'>
-
-        <div className="img-container">
-            <div id='slide-container' className='slider'>
-              {imgList.map((item) => {
-                return(
-                  <img style={{width : '100%'}} src={item} />
-                )
-              })}
-            </div>
-            <img src='./src/assets/left-arrow.png' className="prevbutton" onClick={() => {slideImg(count -1)}} />
-            <img src='./src/assets/right-arrow.png' className="nextbutton" onClick={() => {slideImg(count +1)}} />
-            <div className='listbutton-container'>
-              {imgList.map((item, index) => {
-                return(
-                  <div className="listbutton" onClick={() => {slideImg(index)}} style={{backgroundColor : count == index ? 'white' : 'gray'}}></div>
-                )
-              })}
-            </div>
+        <div style={{backgroundColor : 'rgb(25, 25, 25)'}} className='container'>
+          <div className="img-container">
+              <div id='slide-container' className='slider'>
+                {imgList.map((item) => {
+                  return(
+                    <img style={{width : '100%'}} src={item} />
+                  )
+                })}
+              </div>
+              <div className='img-index'>
+                <p>
+                  {count+1}/{imgList.length}
+                </p>
+              </div>
+              <img src='./src/assets/left-arrow.png' className="prevbutton" onClick={prevImg} />
+              <img src='./src/assets/right-arrow.png' className="nextbutton" onClick={nextImg} />
+              <div className='listbutton-container'>
+                {imgList.map((item, index) => {
+                  return(
+                    <div className="listbutton" onClick={() => {skipImg(index)}} style={{backgroundColor : count == index ? 'white' : 'gray'}}></div>
+                  )
+                })}
+              </div>
+          </div>
         </div>
-
-      </div>
     </div>
   )
 }
