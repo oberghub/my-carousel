@@ -7,7 +7,9 @@ function App() {
     'https://picsum.photos/id/237/1000/500',
     'https://picsum.photos/id/238/1000/500',
     'https://picsum.photos/id/239/1000/500',
-    'https://picsum.photos/id/240/1000/500'
+    'https://picsum.photos/id/240/1000/500',
+    'https://picsum.photos/id/237/1000/500',
+    'https://picsum.photos/id/238/1000/500',
   ])
   const slideImg = (num) => {
 
@@ -23,7 +25,7 @@ function App() {
     let width = imgs[0].clientWidth;
 
     //ถ้า Next จนภาพสุดท้ายแล้วก็ set transform ให้มันย้อนกลับมาภาพที่ 1
-    if(num > 3){
+    if(num > imgList.length-1){
       slider.style.transform = `translate(${0}px)`
       setCount(0)
     }
